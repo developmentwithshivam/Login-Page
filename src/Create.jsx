@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { UseCreatoperation } from "./Creatoperation";
 function Create() {
   const context = UseCreatoperation();
+  const [emailplaceholdercolour, setemailplaceholdercolour] = useState("black");
   const [emailplaceholder, setemailplaceholder] = useState("Enter email");
   const [passwordplaceholder, setpasswordplaceholder] =
     useState("Enter password");
@@ -26,6 +27,7 @@ function Create() {
   };
 
   const setplaceholder = () => {
+    console.log("running");
     if (context.email === "") {
       setemailplaceholder("Please Enter Email");
     }
@@ -81,12 +83,14 @@ function Create() {
     e.preventDefault();
 
     // if (tempemail !== "") {
-    if (context.email !== "") {
-      if (context.password !== "") {
+    // if (context.email) {
+      if (context.email&&context.password !=="") {
+        console.log("running add");
         add();
-        
       }
-    } else {
+    // } 
+    if(context.email || context.password === "") {
+      console.log("running placeholder");
       setplaceholder();
     }
   };
@@ -115,7 +119,7 @@ function Create() {
             // value={temppassword}
             value={context.password}
             placeholder={passwordplaceholder}
-            className="w-96  h-9 bg-slate-100 border-2 border-black rounded-md pl-3"
+            className="w-96  h-9 bg-slate-100 border-2 border-black rounded-md pl-3 "
             onChange={(e) => {
             //   settemppassword(e.target.value);
               context.setpassword(e.target.value);

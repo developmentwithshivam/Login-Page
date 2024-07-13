@@ -2,12 +2,13 @@ import React, { useEffect, useState } from "react";
 import { UseCreatoperation } from "./Creatoperation";
 
 function Read() {
+  const [editid, seteditid] = useState(null);
   const [edit, setedit] = useState(false);
   const context = UseCreatoperation();
   const [getdata, setgetdata] = useState([]);
   const [email, setemail] = useState("");
+  const [password, setpassword] = useState("");
   const myarr = context.data;
-
 
   const deletefunc = (id) => {
     const myfiltereddata = getdata.filter((obj) => obj.id !== id);
@@ -25,99 +26,101 @@ function Read() {
   }, [myarr]);
 
   const toggleedit = (id) => {
-    console.log(getdata);
-    getdata.forEach((obj) => {
-      // obj.id===id?setedit((prev)=>!prev):setedit((prev)=>prev)
-      if (obj.id === id) {
-        setedit((prev) => !prev);
-      } else {
-        setedit((prev) => prev);
-      }
-    });
+    if (id === editid) {
+      updatefunc(id);
+      seteditid(null);
+    } else {
+      seteditid(id);
+    }
   };
-  useEffect(() => {
-    console.log(email);
-  }, [email])
-  
 
-  const updatefunc = (id,newemail) => {
-    // const newemail = e.target.value;
-    setgetdata((prev)=>{
-      prev.map((obj)=>{
-        if(obj.id===id){
-          return {...obj,email:newemail}
+  const changeobjemail=(id)=>{
+    setgetdata((prev) => {
+      return prev.map((obj) => {
+        if (obj.id === id) {
+          if (email) {
+            return { ...obj, email: email };
+          } else {
+            return { ...obj, email: obj.email };
+          }
+        } else {
+          return obj;
         }
-        else{return obj}
-      })
-    })
-  if(getdata){
+      });
+      
+    }
+  );
 
-    localStorage.setItem("storagedata", JSON.stringify(getdata));  
+    localStorage.setItem("storagedata", JSON.stringify(getdata));
   }
-    // toggleedit(id);
+  const changeobjpassword=(id)=>{
+    setgetdata((prev) => {
+      return prev.map((obj) => {
+        // console.log("ID are :", obj.id, id);
+        if (obj.id === id) {
+          if (password) {
+            return { ...obj, password: password };
+          } else {
+            return { ...obj, password: obj.password };
+          }
+        } else {
+          return obj;
+        }
+      });
+      
+    }
+  );
 
-    // console.log("working edit");
-    //   const fetcheddata = JSON.parse(localStorage.getItem("storagedata")||[])
-    //   fetcheddata.map((obj)=>obj.id===id?{...obj,email:"shivamdixiteditable"}:obj)
-
-    // fetcheddata.map((obj)=>obj.id===id?console.log("ID matched ==",id):console.log("nothing"))
+    localStorage.setItem("storagedata", JSON.stringify(getdata));
+  }
+  const updatefunc = (id) => {
+  changeobjemail(id);
+  changeobjpassword(id);
+  setemail("")
+  setpassword("")
   };
-
-  // useEffect(() => {
-
-  // }, [getdata])
-
-  // console.log("here is the data from localStorage",getdata);
-  // function generateRandomId() {
-  //   return Math.floor(Math.random() * 1000000); // Generates a random number between 0 and 999999
-  // }
 
   return (
     <>
       <table>
-        <theader>
+        
           <div className="mt-3 ml-16 text-4xl">Read</div>
           <div className="mt-4">
             <tr>
               <th className=" border border-black w-96 text-center">ID</th>
               <th className=" border border-black w-96 text-center">Email</th>
-              <th className=" border border-black w-96 text-center">
-                Password
-              </th>
+              <th className=" border border-black w-96 text-center">Password</th>
             </tr>
           </div>
-        </theader>
+        
         <tbody>
           <tr>
             {getdata?.length === 0 ? (
-              <th
+              <td
                 className="font-medium text-3xl"
                 style={{ position: "absolute", left: "400px" }}
               >
                 Empty
-              </th>
+              </td>
             ) : (
-              // console.log("nullemlskjflk")
               <>
                 {getdata?.map((obj) => {
-                  // const heloid= generateRandomId()
-                  // let id = index + 1;
-                  // console.log("This is the id=====",id);
                   return (
                     <tr key={obj.id}>
                       <td className=" border border-black w-96 text-center">
                         {obj.id}
                       </td>
-                      {edit === true ? (
-                        <td className=" border border-black w-96 text-center ">
-                          <input
+                      {editid === obj.id ? (
+                        <td >
+                          <input className="focus:outline-none w-96 text-center"
                             type="text"
-                            value={email||obj?.email}
+                            value={email || obj?.email}
                             onChange={(e) => {
                               const newemail = e.target.value;
-                              
-                              setemail(newemail);
-                            
+
+                              if (newemail) {
+                                setemail(newemail);
+                              }
                             }}
                           ></input>
                         </td>
@@ -127,9 +130,24 @@ function Read() {
                         </td>
                       )}
 
+                      {editid=== obj.id?
+                      <td className=" border border-black w-96 text-center ">
+                      <input
+                        type="text"
+                        value={password || obj?.password}
+                        onChange={(e) => {
+                          const newpassword = e.target.value;
+
+                          if (newpassword) {
+                            setpassword(newpassword);
+                          }
+                        }}
+                      ></input>
+                    </td>:
                       <td className=" border border-black w-96 text-center">
                         {obj.password}
-                      </td>
+                      </td>}
+                      
                       <td>
                         <button
                           className=" w-24  h-8 bg-red-700  rounded-md text-white hover:bg-red-500 text-center"
@@ -142,10 +160,12 @@ function Read() {
                       </td>
                       <td>
                         <button
-                          className=" w-24  h-8 bg-blue-700  rounded-md text-white hover:bg-blue-500 text-center"  
-                          onClick={()=>{toggleedit(obj.id)}}
+                          className=" w-24  h-8 bg-blue-700  rounded-md text-white hover:bg-blue-500 text-center"
+                          onClick={() => {
+                            toggleedit(obj.id);
+                          }}
                         >
-                          {edit === false ? "Edit" : "Save"}
+                          {editid === obj.id ? "Save" : "Edit"}
                         </button>
                       </td>
                     </tr>
